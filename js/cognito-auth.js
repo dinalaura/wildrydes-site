@@ -1,4 +1,4 @@
-/*global WildRydes _config AmazonCognitoIdentity AWSCognito*/
+/*global WildRydes _config AmazonCognitoIdentity AWSCognito CryptoJS*/
 
 var WildRydes = window.WildRydes || {};
 
@@ -21,7 +21,6 @@ var WildRydes = window.WildRydes || {};
         return;
     }
 
-    // Add clientSecret for additional security if required by your implementation
     var clientSecret = _config.cognito.clientSecret;
 
     userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
@@ -52,33 +51,24 @@ var WildRydes = window.WildRydes || {};
         }
     });
 
-    /*
-     * Cognito User Pool functions
-     */
-
     function register(email, password, onSuccess, onFailure) {
-        var dataEmail = {
-            Name: 'email',
-            Value: email
-        };
+        var dataEmail = { Name: 'email', Value: email };
         var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
 
-        userPool.signUp(toUsername(email), password, [attributeEmail], null,
-            function signUpCallback(err, result) {
-                if (!err) {
-                    onSuccess(result);
-                } else {
-                    onFailure(err);
-                }
+        userPool.signUp(toUsername(email), password, [attributeEmail], null, function signUpCallback(err, result) {
+            if (!err) {
+                onSuccess(result);
+            } else {
+                onFailure(err);
             }
-        );
+        });
     }
 
     function signin(email, password, onSuccess, onFailure) {
         var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
             Username: toUsername(email),
             Password: password,
-            SecretHash: getSecretHash(toUsername(email), clientSecret)
+            SecretHash: getSecretHash(toUsername(email))
         });
 
         var cognitoUser = createCognitoUser(email);
@@ -109,14 +99,10 @@ var WildRydes = window.WildRydes || {};
         return email.replace('@', '-at-');
     }
 
-    function getSecretHash(username, clientSecret) {
+    function getSecretHash(username) {
         var hash = CryptoJS.HmacSHA256(username + _config.cognito.userPoolClientId, clientSecret);
         return CryptoJS.enc.Base64.stringify(hash);
     }
-
-    /*
-     *  Event Handlers
-     */
 
     $(function onDocReady() {
         $('#signinForm').submit(handleSignin);
