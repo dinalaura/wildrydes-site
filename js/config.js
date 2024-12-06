@@ -6,6 +6,6 @@ window._config = {
         region: 'us-west-2' // Replace with your AWS region
     },
     api: {
-        invokeUrl: 'https://api.example.com/prod' // Optional: Replace with your API Gateway URL if applicable
+        invokeUrl: '' // Optional: Replace with your API Gateway URL if applicable
     }
 };
