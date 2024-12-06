@@ -1,4 +1,4 @@
-/*global WildRydes _config AmazonCognitoIdentity AWSCognito CryptoJS*/
+/*global WildRydes _config AmazonCognitoIdentity CryptoJS*/
 
 var WildRydes = window.WildRydes || {};
 
@@ -12,11 +12,12 @@ var WildRydes = window.WildRydes || {};
 
     var userPool;
 
-    // Validate required Cognito config variables
+    // Ensure necessary Cognito configuration is present
     if (!(_config.cognito.userPoolId &&
           _config.cognito.userPoolClientId &&
           _config.cognito.region &&
           _config.cognito.clientSecret)) {
+        console.error("Cognito configuration is missing or incomplete.");
         $('#noCognitoMessage').show();
         return;
     }
@@ -24,10 +25,6 @@ var WildRydes = window.WildRydes || {};
     var clientSecret = _config.cognito.clientSecret;
 
     userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-
-    if (typeof AWSCognito !== 'undefined') {
-        AWSCognito.config.region = _config.cognito.region;
-    }
 
     WildRydes.signOut = function signOut() {
         userPool.getCurrentUser().signOut();
@@ -100,7 +97,9 @@ var WildRydes = window.WildRydes || {};
     }
 
     function getSecretHash(username) {
-        var hash = CryptoJS.HmacSHA256(username + _config.cognito.userPoolClientId, clientSecret);
+        var message = username + _config.cognito.userPoolClientId;
+        var key = CryptoJS.enc.Utf8.parse(clientSecret);
+        var hash = CryptoJS.HmacSHA256(message, key);
         return CryptoJS.enc.Base64.stringify(hash);
     }
 
@@ -120,7 +119,7 @@ var WildRydes = window.WildRydes || {};
                 window.location.href = 'ride.html';
             },
             function signinError(err) {
-                alert(err);
+                alert(err.message || JSON.stringify(err));
             }
         );
     }
@@ -133,13 +132,11 @@ var WildRydes = window.WildRydes || {};
         var onSuccess = function registerSuccess(result) {
             var cognitoUser = result.user;
             console.log('user name is ' + cognitoUser.getUsername());
-            var confirmation = ('Registration successful. Please check your email inbox or spam folder for your verification code.');
-            if (confirmation) {
-                window.location.href = 'verify.html';
-            }
+            alert('Registration successful. Please check your email for the verification code.');
+            window.location.href = 'verify.html';
         };
         var onFailure = function registerFailure(err) {
-            alert(err);
+            alert(err.message || JSON.stringify(err));
         };
         event.preventDefault();
 
@@ -156,13 +153,12 @@ var WildRydes = window.WildRydes || {};
         event.preventDefault();
         verify(email, code,
             function verifySuccess(result) {
-                console.log('call result: ' + result);
                 console.log('Successfully verified');
-                alert('Verification successful. You will now be redirected to the login page.');
+                alert('Verification successful. Redirecting to the login page.');
                 window.location.href = signinUrl;
             },
             function verifyError(err) {
-                alert(err);
+                alert(err.message || JSON.stringify(err));
             }
         );
     }
