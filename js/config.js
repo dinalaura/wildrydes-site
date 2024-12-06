@@ -1,11 +1,10 @@
 window._config = {
     cognito: {
-        userPoolId: 'us-west-2_d56UrmgcG', // Replace with your actual User Pool ID
-        userPoolClientId: '54hmbpn4ct7tic8f6q8qbvft2u', // Replace with your actual App Client ID
-        clientSecret: '1ikkgbqs8q19g1v5s111oso04u90eoioq30v619u3e5gh20k7qmt', // Replace with your actual Client Secret
-        region: 'us-west-2' // Replace with your AWS region
+        userPoolId: 'us-west-2_sey9mTcXd', // e.g. us-east-2_uXboG5pAb
+        userPoolClientId: '3edmtm0ip9bik5nvnrnl6f738e', // e.g. 25ddkmj4v6hfsfvruhpfi7n4hv
+        region: 'us-west-2' // e.g. us-east-2
     },
     api: {
-        invokeUrl: '' // Optional: Replace with your API Gateway URL if applicable
+        invokeUrl: '' // e.g. https://rc7nyt4tql.execute-api.us-west-2.amazonaws.com/prod',
     }
 };
