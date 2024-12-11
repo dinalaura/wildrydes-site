@@ -15,7 +15,7 @@ html, body, #main, #map {
 }
 
 .info .panel-body {
-    background: transparent;
+    background: #461C62;
 }
 
 #request {
