@@ -218,6 +218,37 @@
                         });
                     }
                 });
+
+                AWS.config.credentials.get(function (err) {
+                    if (err) {
+                        console.error(err, err.stack);
+                    } else {
+                        var lexRuntime = new AWS.LexRuntime();
+
+                        document.getElementById('sendButton').addEventListener('click', function () {
+                            var input = document.getElementById('chatInput').value;
+                            var userId = generateUUID(); // Generate a unique identifier for the user
+
+                            var params = {
+                                agentAlias: 'Alias', // Replace with your agent's alias
+                                agentName: 'MarketingBuilder', // Replace with your agent's name
+                                userId: userId,
+                                inputText: input
+                            };
+
+                            lexRuntime.postText(params, function (err, data) {
+                                if (err) {
+                                    console.error(err, err.stack);
+                                } else {
+                                    var chatMessages = document.getElementById('chatMessages');
+                                    var newMessage = document.createElement('div');
+                                    newMessage.textContent = data.message;
+                                    chatMessages.appendChild(newMessage);
+                                }
+                            });
+                        });
+                    }
+                });
             },
             onFailure: function (err) {
                 console.error('Authentication failed:', err.message || JSON.stringify(err));
