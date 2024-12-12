@@ -140,8 +140,8 @@
             IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650',
         });
 
-        // Create a new Amazon Bedrock client
-        var bedrock = new AWS.Bedrock({ apiVersion: '2017-07-25' });
+        // Create a new Amazon Lex client
+        var lexRuntime = new AWS.LexRuntime({ apiVersion: '2016-11-28' });
 
         document.getElementById('sendButton').addEventListener('click', function () {
             var input = document.getElementById('chatInput').value;
@@ -158,7 +158,7 @@
                 userId: '1', // A unique identifier for the user
             };
 
-            bedrock.postText(params, function (err, data) {
+            lexRuntime.postText(params, function (err, data) {
                 if (err) {
                     console.log(err, err.stack); // An error occurred
                 } else {
