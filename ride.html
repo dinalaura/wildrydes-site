@@ -83,7 +83,7 @@
                 },
                 body: JSON.stringify({ message: userMessage }),
             })
-            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(response => response.json().then(data => ({ status: response.status, body: JSON.parse(data.body) })))
             .then(({ status, body }) => { 
                 if (status !== 200) {
                     console.error('Error:', body);
