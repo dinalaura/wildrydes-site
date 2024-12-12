@@ -44,36 +44,23 @@
             color: green;
         }
     </style>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@4.5.10/dist/amazon-cognito-identity.min.js"></script>
 </head>
 
 <body>
-    <div class="info panel panel-default" hidden>
+    <div class="chat-box panel panel-default">
         <div class="panel-heading">
-            <button id="request" class="btn btn-primary" disabled hidden>Set pickup</button>
-            <div class="dropdown pull-right">
-                <button id="accountLink" class="btn" type="button" data-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
-                    Account <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="accountLink">
-                    <li><a id="signOut" href="#">Sign out</a></li>
-                </ul>
-            </div>
+            <h3 class="panel-title">AWS Solution - Marketing Campaign Builder</h3>
         </div>
         <div class="panel-body">
-            <ol id="updates">
-                <li></li>
-            </ol>
+            <div id="chatMessages"></div>
+            <div class="input-group">
+                <input type="text" id="chatInput" class="form-control" placeholder="Escribe tu pregunta...">
+                <span class="input-group-btn">
+                    <button id="sendButton" class="btn btn-primary" type="button">Enter</button>
+                </span>
+            </div>
         </div>
     </div>
-
-    <!-- NEW SECTION -->
-    <div class="chat-box" id="chatBox"></div>
-    <input type="text" id="userMessage" placeholder="Type a message..." />
-    <button onclick="sendMessage()">Send</button>
 
     <div class="sample-questions panel panel-default">
         <div class="panel-heading">
@@ -138,16 +125,10 @@
         </div>
     </div>
 
-    <script src="js/vendor/jquery-3.1.0.js"></script>
-    <script src="js/vendor/bootstrap.min.js"></script>
-    <script src="https://js.arcgis.com/4.6/"></script>
-    <script src="js/config.js"></script>
-    <script src="js/cognito-auth.js"></script>
-    <script src="js/esri-map.js"></script>
-    <script src="js/ride.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
     <script>
-        const chatBox = document.getElementById("chatBox");
-        const userMessageInput = document.getElementById("userMessage");
+        const chatBox = document.getElementById("chatMessages");
+        const userMessageInput = document.getElementById("chatInput");
 
         // Function to send message
         function sendMessage() {
@@ -182,7 +163,16 @@
                 chatBox.innerHTML += `<div class="bot-message">Error: ${error.message}</div>`;
             });
         }
+
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
     </script>
+    <script src="js/vendor/jquery-3.1.0.js"></script>
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="https://js.arcgis.com/4.6/"></script>
+    <script src="js/config.js"></script>
+    <script src="js/cognito-auth.js"></script>
+    <script src="js/esri-map.js"></script>
+    <script src="js/ride.js"></script>
 </body>
 
 </html>
