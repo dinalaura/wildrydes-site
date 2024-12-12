@@ -139,8 +139,7 @@
     <script src="js/vendor/jquery-3.1.0.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
-    <script src="js/vendor/aws-cognito-sdk.min.js"></script>
-    <script src="js/vendor/amazon-cognito-identity.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@4.5.10/dist/amazon-cognito-identity.min.js"></script>
     <script src="https://js.arcgis.com/4.6/"></script>
     <script src="js/config.js"></script>
     <script src="js/cognito-auth.js"></script>
@@ -166,7 +165,10 @@
 
         AWS.config.region = 'us-west-2';
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650'
+            IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650',
+            Logins: {
+                'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
+            }
         });
 
         var lexRuntime = new AWS.LexRuntime();
@@ -199,6 +201,53 @@
                 }
             });
             });
+
+        // Configure AWS region
+        AWS.config.region = 'us-west-2'; // Replace with your region
+
+        // Cognito User Pool data
+        var poolData = {
+            UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
+            // Your user pool id here
+            UserPoolId: 'us-west-2_sey9mTcXd',
+            ClientId: '1example23456789' // Your client id here
+        };
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+        // User authentication data
+        var authenticationData = {
+            Username: 'dinaguev1@gmail.com', // Replace with the username
+            Password: 'ho5laEAST%', // Replace with the password
+        };
+        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+
+        // User data
+        var userData = {
+            Username: 'dinaguev1@gmail.com', // Replace with the username
+            Pool: userPool
+        };
+        var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+        // Authenticate the user
+        cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: function (result) {
+                var idToken = result.getIdToken().getJwtToken();
+                console.log('ID Token: ' + idToken);
+
+                // Use the ID token for AWS credentials
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
+                    Logins: {
+                        'cognito-idp.us-west-2.amazonaws.com/us-west-2_abcdefghi': idToken
+                    }
+                });
+
+                // Now you can use AWS services with the authenticated user
+            },
+            onFailure: function (err) {
+                console.error(err);
+            }
+        });
     </script>
 </body>
 
