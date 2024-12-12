@@ -162,6 +162,10 @@
         });
 
         document.getElementById('sendButton').addEventListener('click', function() {
+            if (!bedrockAgent) {
+                console.error('BedrockAgent is not initialized.');
+                return;
+            }
             var input = document.getElementById('chatInput').value;
             var userId = generateUUID(); // Generate a unique identifier for the user
 
@@ -183,23 +187,49 @@
                 }
             });
         });
-        // Remove Lex initialization and usage
-        // Configure AWS region
-        AWS.config.region = 'us-west-2'; // Replace with your region
 
-        // Cognito User Pool data
-        var poolData = {
-            UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
-            ClientId: '3edmtm0ip9bik5nvnrnl6f738e' // Your client id here
-        };
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+        document.getElementById('sendButton').addEventListener('click', function() {
+            var input = document.getElementById('chatInput').value;
+            var userId = generateUUID(); // Generate a unique identifier for the user
 
-        // User authentication data
-        var authenticationData = {
-            Username: 'dinaguev1@gmail.com', // Replace with the username
-            Password: 'ho5laEAST%', // Replace with the password
-        };
-        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+            var params = {
+                agentAlias: 'Alias', // Replace with your agent's alias
+                agentName: 'MarketingBuilder', // Replace with your agent's name
+                userId: userId,
+                inputText: input
+            };
+
+            bedrockAgent.postText(params, function(err, data) {
+                if (err) {
+                    console.error(err, err.stack);
+                } else {
+                    var chatMessages = document.getElementById('chatMessages');
+                    var newMessage = document.createElement('div');
+                    newMessage.textContent = data.message;
+                    chatMessages.appendChild(newMessage);
+                }
+            });
+        cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: function (result) {
+                var idToken = result.getIdToken().getJwtToken();
+                console.log('ID Token: ' + idToken);
+
+                // Use the ID token for AWS credentials
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
+                    Logins: {
+                        'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
+                    }
+                });
+
+                bedrockAgent = new AWS.BedrockAgent();
+
+                // Now you can use AWS services with the authenticated user
+            },
+            onFailure: function(err) {
+                console.error('Authentication failed:', err.message || JSON.stringify(err));
+            }
+        });
 
         // User data
         var userData = {
