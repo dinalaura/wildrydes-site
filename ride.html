@@ -134,126 +134,47 @@
     <script src="js/esri-map.js"></script>
     <script src="js/ride.js"></script>
     <script>
-        // Function to generate a UUID
-        function generateUUID() {
-            var d = new Date().getTime();
-            var d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16;
-            if (d > 0) {
-                r = (d + r) % 16 | 0;
-                d = Math.floor(d / 16);
-            } else {
-                r = (d2 + r) % 16 | 0;
-                d2 = Math.floor(d2 / 16);
+        // Initialize the Amazon Cognito credentials provider
+        AWS.config.region = 'us-west-2'; // Region
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650',
+        });
+
+        // Create a new Amazon Bedrock client
+        var bedrock = new AWS.Bedrock({ apiVersion: '2017-07-25' });
+
+        document.getElementById('sendButton').addEventListener('click', function () {
+            var input = document.getElementById('chatInput').value;
+            if (input) {
+                sendMessageToBedrock(input);
             }
-            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+
+        function sendMessageToBedrock(message) {
+            var params = {
+                botAlias: 'Alias', // The alias of the bot
+                botName: 'MarketingBuilder', // The name of the bot
+                inputText: message,
+                userId: '1', // A unique identifier for the user
+            };
+
+            bedrock.postText(params, function (err, data) {
+                if (err) {
+                    console.log(err, err.stack); // An error occurred
+                } else {
+                    displayMessage(data.message); // Successful response
+                }
             });
         }
 
-        // Configure AWS region
-        AWS.config.region = 'us-west-2'; // Replace with your region
-
-        // Cognito User Pool data
-        var poolData = {
-            UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
-            ClientId: '3edmtm0ip9bik5nvnrnl6f738e' // Your client id here
-        };
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
-
-        // User authentication data
-        var authenticationData = {
-            Username: 'dinaguev-at-amazon.com', // Replace with the correct username
-            Password: 'ho5laEAST%' // Replace with the correct password
-        };
-        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
-
-        // User data
-        var userData = {
-            Username: 'dinaguev-at-amazon.com', // Replace with the username
-            Pool: userPool
-        };
-        var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-
-        // Authenticate the user
-        cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: function (result) {
-                var idToken = result.getIdToken().getJwtToken();
-
-                // Configure AWS credentials with the ID token
-                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                    IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
-                    Logins: {
-                        'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
-                    }
-                });
-
-                AWS.config.credentials.get(function (err) {
-                    if (err) {
-                        console.error(err, err.stack);
-                    } else {
-                        var lexRuntime = new AWS.LexRuntime();
-
-                        document.getElementById('sendButton').addEventListener('click', function () {
-                            var input = document.getElementById('chatInput').value;
-                            var userId = generateUUID(); // Generate a unique identifier for the user
-
-                            var params = {
-                                botAlias: 'Alias', // Replace with your bot's alias
-                                botName: 'MarketingBuilder', // Replace with your bot's name
-                                userId: userId,
-                                inputText: input
-                            };
-
-                            lexRuntime.postText(params, function (err, data) {
-                                if (err) {
-                                    console.error(err, err.stack);
-                                } else {
-                                    var chatMessages = document.getElementById('chatMessages');
-                                    var newMessage = document.createElement('div');
-                                    newMessage.textContent = data.message;
-                                    chatMessages.appendChild(newMessage);
-                                }
-                            });
-                        });
-                    }
-                });
-
-                AWS.config.credentials.get(function (err) {
-                    if (err) {
-                        console.error(err, err.stack);
-                    } else {
-                        var lexRuntime = new AWS.LexRuntime();
-
-                        document.getElementById('sendButton').addEventListener('click', function () {
-                            var input = document.getElementById('chatInput').value;
-                            var userId = generateUUID(); // Generate a unique identifier for the user
-
-                            var params = {
-                                agentAlias: 'Alias', // Replace with your agent's alias
-                                agentName: 'MarketingBuilder', // Replace with your agent's name
-                                userId: userId,
-                                inputText: input
-                            };
-
-                            lexRuntime.postText(params, function (err, data) {
-                                if (err) {
-                                    console.error(err, err.stack);
-                                } else {
-                                    var chatMessages = document.getElementById('chatMessages');
-                                    var newMessage = document.createElement('div');
-                                    newMessage.textContent = data.message;
-                                    chatMessages.appendChild(newMessage);
-                                }
-                            });
-                        });
-                    }
-                });
-            },
-            onFailure: function (err) {
-                console.error('Authentication failed:', err.message || JSON.stringify(err));
-            }
-        });
+        function displayMessage(message) {
+            var chatMessages = document.getElementById('chatMessages');
+            var messageElement = document.createElement('div');
+            messageElement.className = 'chat-message';
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+            document.getElementById('chatInput').value = '';
+        }
     </script>
 </body>
 
