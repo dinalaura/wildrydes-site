@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <title>Marketing Campaign Builder</title>
-    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Serverless web application example">
@@ -163,15 +162,7 @@
             });
         }
 
-        AWS.config.region = 'us-west-2';
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650',
-            Logins: {
-                'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
-            }
-        });
-
-        var lexRuntime = new AWS.LexRuntime();
+        var lexRuntime;
 
         document.getElementById('sendButton').addEventListener('click', function() {
             var input = document.getElementById('chatInput').value;
@@ -200,7 +191,7 @@
                     });
                 }
             });
-            });
+        });
 
         // Configure AWS region
         AWS.config.region = 'us-west-2'; // Replace with your region
@@ -242,13 +233,21 @@
                     }
                 });
 
+                // Use the ID token for AWS credentials
+                AWS.config.region = 'us-west-2';
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
+                    Logins: {
+                        'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
+                    }
+                });
+
+                lexRuntime = new AWS.LexRuntime();
+                lexRuntime = new AWS.LexRuntime();
+
                 // Now you can use AWS services with the authenticated user
-            },
-            onFailure: function (err) {
-                console.error(err);
             }
         });
     </script>
 </body>
-
 </html>
