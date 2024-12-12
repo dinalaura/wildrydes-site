@@ -163,14 +163,14 @@
 
         // User authentication data
         var authenticationData = {
-            Username: 'dinaguev@amazon.com', // Replace with the username
-            Password: 'ho5laEAST%' // Replace with the password
+            Username: 'dinaguev-at-amazon.com', // Replace with the correct username
+            Password: 'ho5laEAST%' // Replace with the correct password
         };
         var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
 
         // User data
         var userData = {
-            Username: 'dinaguev@amazon.com', // Replace with the username
+            Username: 'dinaguev-at-amazon.com', // Replace with the username
             Pool: userPool
         };
         var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
