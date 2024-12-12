@@ -198,21 +198,6 @@
                     });
                 }
             });
-                botAlias: 'Alias', // Replace with your bot's alias
-                botName: 'MarketingBuilder', // Replace with your bot's name
-                userId: userId,
-                inputText: input
-            };
-
-            lexRuntime.postText(params, function(err, data) {
-                if (err) {
-                    console.error(err, err.stack);
-                } else {
-                    var chatMessages = document.getElementById('chatMessages');
-                    var newMessage = document.createElement('div');
-                    newMessage.textContent = data.message;
-                    chatMessages.appendChild(newMessage);
-                }
             });
     </script>
 </body>
