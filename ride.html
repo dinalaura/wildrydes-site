@@ -169,7 +169,7 @@
             IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650'
         });
 
-        var bedrock = new AWS.Bedrock();
+        var lexRuntime = new AWS.LexRuntime();
 
         document.getElementById('sendButton').addEventListener('click', function() {
             var input = document.getElementById('chatInput').value;
@@ -182,7 +182,7 @@
                 UserId: userId
             };
 
-            bedrock.postText(params, function(err, data) {
+            lexRuntime.postText(params, function(err, data) {
                 if (err) {
                     console.error(err, err.stack);
                 } else {
