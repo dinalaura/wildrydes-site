@@ -146,12 +146,12 @@
     <script src="js/esri-map.js"></script>
     <script src="js/ride.js"></script>
     <script>
-            const chatBox = document.getElementById("chatBox");
-            const userMessageInput = document.getElementById("userMessage");
+        const chatBox = document.getElementById("chatBox");
+        const userMessageInput = document.getElementById("userMessage");
 
-            // Function to send message
-            function sendMessage() {
-    const userMessage = userMessageInput.value;
+        // Function to send message
+        function sendMessage() {
+            const userMessage = userMessageInput.value;
             if (!userMessage) return; // Do not send empty messages
 
             // Display user's message in the chat box
@@ -161,21 +161,21 @@
             // Send message to API Gateway
             fetch('https://rimelmpq65.execute-api.us-west-2.amazonaws.com/prod', {
                 method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-      },
-            body: JSON.stringify({message: userMessage }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      const botMessage = data.message;  // The bot's response from the Lambda function
-            chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  }
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const botMessage = data.message;  // The bot's response from the Lambda function
+                chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
 </body>
 
