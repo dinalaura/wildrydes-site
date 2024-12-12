@@ -192,20 +192,20 @@
                     if (err) {
                         console.error(err, err.stack);
                     } else {
-                        var bedrockAgent = new AWS.BedrockAgent();
+                        var lexRuntime = new AWS.LexRuntime();
 
                         document.getElementById('sendButton').addEventListener('click', function () {
                             var input = document.getElementById('chatInput').value;
                             var userId = generateUUID(); // Generate a unique identifier for the user
 
                             var params = {
-                                agentAlias: 'Alias', // Replace with your agent's alias
-                                agentName: 'MarketingBuilder', // Replace with your agent's name
+                                botAlias: 'Alias', // Replace with your bot's alias
+                                botName: 'MarketingBuilder', // Replace with your bot's name
                                 userId: userId,
                                 inputText: input
                             };
 
-                            bedrockAgent.postText(params, function (err, data) {
+                            lexRuntime.postText(params, function (err, data) {
                                 if (err) {
                                     console.error(err, err.stack);
                                 } else {
