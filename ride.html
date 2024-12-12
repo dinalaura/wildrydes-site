@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -8,7 +9,8 @@
     <meta name="description" content="Serverless web application example">
     <meta name="author" content="">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
     <link rel="stylesheet" href="/css/ride.css">
     <link rel="stylesheet" href="/css/message.css">
@@ -18,12 +20,14 @@
         }
     </style>
 </head>
+
 <body>
     <div class="info panel panel-default" hidden>
         <div class="panel-heading">
             <button id="request" class="btn btn-primary" disabled hidden>Set pickup</button>
             <div class="dropdown pull-right">
-                <button id="accountLink" class="btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button id="accountLink" class="btn" type="button" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
                     Account <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="accountLink">
@@ -79,8 +83,10 @@
                 <h3 class="panel-title">Successfully Authenticated!</h3>
             </div>
             <div class="panel-body">
-                <p>This page is not functional yet because there is no API invoke URL configured in <a href="/js/config.js">/js/config.js</a>. You'll configure this in Module 3.</p>
-                <p>In the meantime, if you'd like to test the Amazon Cognito user pool authorizer for your API, use the auth token below:</p>
+                <p>This page is not functional yet because there is no API invoke URL configured in <a
+                        href="/js/config.js">/js/config.js</a>. You'll configure this in Module 3.</p>
+                <p>In the meantime, if you'd like to test the Amazon Cognito user pool authorizer for your API, use the
+                    auth token below:</p>
                 <textarea class="authToken"></textarea>
             </div>
         </div>
@@ -93,7 +99,8 @@
                 <h3 class="panel-title">No Cognito User Pool Configured</h3>
             </div>
             <div class="panel-body">
-                <p>There is no user pool configured in <a href="/js/config.js">/js/config.js</a>. You'll configure this in Module 2 of the workshop.</p>
+                <p>There is no user pool configured in <a href="/js/config.js">/js/config.js</a>. You'll configure this
+                    in Module 2 of the workshop.</p>
             </div>
         </div>
     </div>
@@ -102,7 +109,8 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="myModalLabel">Your Auth Token</h4>
                 </div>
                 <div class="modal-body">
@@ -118,7 +126,8 @@
     <script src="js/vendor/jquery-3.1.0.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@4.5.10/dist/amazon-cognito-identity.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@4.5.10/dist/amazon-cognito-identity.min.js"></script>
     <script src="https://js.arcgis.com/4.6/"></script>
     <script src="js/config.js"></script>
     <script src="js/cognito-auth.js"></script>
@@ -129,16 +138,16 @@
         function generateUUID() {
             var d = new Date().getTime();
             var d2 = (performance && performance.now && (performance.now() * 1000)) || 0;
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16;
-                if (d > 0) {
-                    r = (d + r) % 16 | 0;
-                    d = Math.floor(d / 16);
-                } else {
-                    r = (d2 + r) % 16 | 0;
-                    d2 = Math.floor(d2 / 16);
-                }
-                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16;
+            if (d > 0) {
+                r = (d + r) % 16 | 0;
+                d = Math.floor(d / 16);
+            } else {
+                r = (d2 + r) % 16 | 0;
+                d2 = Math.floor(d2 / 16);
+            }
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
             });
         }
 
@@ -153,7 +162,7 @@
             IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
         });
 
-        AWS.config.credentials.get(function(err) {
+        AWS.config.credentials.get(function (err) {
             if (err) {
                 console.error(err, err.stack);
             } else {
@@ -161,7 +170,7 @@
             }
         });
 
-        document.getElementById('sendButton').addEventListener('click', function() {
+        document.getElementById('sendButton').addEventListener('click', function () {
             if (!bedrockAgent) {
                 console.error('BedrockAgent is not initialized.');
                 return;
@@ -176,7 +185,7 @@
                 inputText: input
             };
 
-            bedrockAgent.postText(params, function(err, data) {
+            bedrockAgent.postText(params, function (err, data) {
                 if (err) {
                     console.error(err, err.stack);
                 } else {
@@ -186,29 +195,21 @@
                     chatMessages.appendChild(newMessage);
                 }
             });
+        // Ensure cognitoUser and authenticationDetails are defined
+        var cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+            Username: 'dinaguev1@gmail.com', // Replace with the actual username
+            Pool: userPool // Ensure userPool is defined
+        });
+        // Ensure userPool is defined
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool({
+            UserPoolId: 'us-west-2_sey9mTcXd', // Replace with your user pool ID
+            ClientId: '3edmtm0ip9bik5nvnrnl6f738e' // Replace with your client ID
+        });
+        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
+            Username: 'dinaguev1@gmail.com', // Replace with the actual username
+            Password: 'ho5laEAST%' // Replace with the actual password
         });
 
-        document.getElementById('sendButton').addEventListener('click', function() {
-            var input = document.getElementById('chatInput').value;
-            var userId = generateUUID(); // Generate a unique identifier for the user
-
-            var params = {
-                agentAlias: 'Alias', // Replace with your agent's alias
-                agentName: 'MarketingBuilder', // Replace with your agent's name
-                userId: userId,
-                inputText: input
-            };
-
-            bedrockAgent.postText(params, function(err, data) {
-                if (err) {
-                    console.error(err, err.stack);
-                } else {
-                    var chatMessages = document.getElementById('chatMessages');
-                    var newMessage = document.createElement('div');
-                    newMessage.textContent = data.message;
-                    chatMessages.appendChild(newMessage);
-                }
-            });
         cognitoUser.authenticateUser(authenticationDetails, {
             onSuccess: function (result) {
                 var idToken = result.getIdToken().getJwtToken();
@@ -222,41 +223,22 @@
                     }
                 });
 
-                bedrockAgent = new AWS.BedrockAgent();
+                AWS.config.credentials.get(function (err) {
+                    if (err) {
+                        console.error(err, err.stack);
+                    } else {
+                        bedrockAgent = new AWS.BedrockAgent();
+                    }
+                });
 
                 // Now you can use AWS services with the authenticated user
             },
-            onFailure: function(err) {
+            onFailure: function (err) {
                 console.error('Authentication failed:', err.message || JSON.stringify(err));
             }
         });
-
-        // User data
-        var userData = {
-            Username: 'dinaguev1@gmail.com', // Replace with the username
-            Pool: userPool
-        };
-        var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-
-        // Authenticate the user
-        cognitoUser.authenticateUser(authenticationDetails, {
-            onSuccess: function (result) {
-                var idToken = result.getIdToken().getJwtToken();
-                console.log('ID Token: ' + idToken);
-
-                // Use the ID token for AWS credentials
-                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                    IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
-                    Logins: {
-                        'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
-                    }
-                });
-
-                bedrockAgent = new AWS.BedrockAgent();
-
-                // Now you can use AWS services with the authenticated user
-            }
         });
     </script>
 </body>
+
 </html>
