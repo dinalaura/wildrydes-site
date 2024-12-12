@@ -2,29 +2,26 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Marketing Campaign Builder</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Serverless web application example">
     <meta name="author" content="">
-
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://js.arcgis.com/4.6/esri/css/main.css">
     <link rel="stylesheet" href="/css/ride.css">
     <link rel="stylesheet" href="/css/message.css">
-</head>
-
-<body>
     <style>
-    body {
-        background-color: #9898f5;
-    }
-</style>
+        body {
+            background-color: #9898f5;
+        }
+    </style>
+</head>
+<body>
     <div class="info panel panel-default" hidden>
         <div class="panel-heading">
-            <button id="request" class="btn btn-primary" disabled="disabled" hidden>Set pickup</button>
+            <button id="request" class="btn btn-primary" disabled hidden>Set pickup</button>
             <div class="dropdown pull-right">
                 <button id="accountLink" class="btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Account <span class="caret"></span>
@@ -41,14 +38,7 @@
         </div>
     </div>
 
-    <!--  NEW SECTION-->
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+    <!-- NEW SECTION -->
     <div class="chat-box panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">AWS Solution - Marketing Campaign Builder</h3>
@@ -74,13 +64,14 @@
             <ul>
                 <li>Pregunta 1</li>
                 <li>Pregunta 2</li>
-                <li>Pregunta 3 </li>
+                <li>Pregunta 3</li>
                 <li>Pregunta 4</li>
                 <li>Pregunta 5</li>
             </ul>
         </div>
     </div>
-<!-- END OF NEW SECTION-->
+    <!-- END OF NEW SECTION -->
+
     <div id="noApiMessage" class="configMessage" style="display: none;">
         <div class="backdrop"></div>
         <div class="panel panel-default">
@@ -92,11 +83,6 @@
                 <p>In the meantime, if you'd like to test the Amazon Cognito user pool authorizer for your API, use the auth token below:</p>
                 <textarea class="authToken"></textarea>
             </div>
-            <style>
-                #map {
-                    display: none;
-                }
-            </style>
         </div>
     </div>
 
@@ -113,10 +99,9 @@
     </div>
 
     <div id="main">
-        <div id="map">
-        </div>
+        <div id="map"></div>
     </div>
-    <!-- Hidden element -->
+
     <div id="authTokenModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="authToken" hidden>
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -133,7 +118,6 @@
             </div>
         </div>
     </div>
-
 
     <script src="js/vendor/jquery-3.1.0.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
@@ -162,6 +146,19 @@
             });
         }
 
+        // Initialize AWS Lex Runtime
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
+        });
+
+        AWS.config.credentials.get(function(err) {
+            if (err) {
+                console.error(err, err.stack);
+            } else {
+                lexRuntime = new AWS.LexRuntime();
+            }
+        });
+
         var lexRuntime;
 
         document.getElementById('sendButton').addEventListener('click', function() {
@@ -175,22 +172,26 @@
                 inputText: input
             };
 
-            AWS.config.credentials.get(function(err) {
-                if (err) {
-                    console.error(err, err.stack);
-                } else {
-                    lexRuntime.postText(params, function(err, data) {
-                        if (err) {
-                            console.error(err, err.stack);
-                        } else {
-                            var chatMessages = document.getElementById('chatMessages');
-                            var newMessage = document.createElement('div');
-                            newMessage.textContent = data.message;
-                            chatMessages.appendChild(newMessage);
-                        }
-                    });
-                }
-            });
+            if (AWS.config.credentials) {
+                AWS.config.credentials.get(function(err) {
+                    if (err) {
+                        console.error(err, err.stack);
+                    } else {
+                        lexRuntime.postText(params, function(err, data) {
+                            if (err) {
+                                console.error(err, err.stack);
+                            } else {
+                                var chatMessages = document.getElementById('chatMessages');
+                                var newMessage = document.createElement('div');
+                                newMessage.textContent = data.message;
+                                chatMessages.appendChild(newMessage);
+                            }
+                        });
+                    }
+                });
+            } else {
+                console.error("AWS.config.credentials is null");
+            }
         });
 
         // Configure AWS region
@@ -199,8 +200,6 @@
         // Cognito User Pool data
         var poolData = {
             UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
-            // Your user pool id here
-            UserPoolId: 'us-west-2_sey9mTcXd',
             ClientId: '3edmtm0ip9bik5nvnrnl6f738e' // Your client id here
         };
         var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
@@ -229,20 +228,10 @@
                 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                     IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
                     Logins: {
-                        'cognito-idp.us-west-2.amazonaws.com/us-west-2_abcdefghi': idToken
-                    }
-                });
-
-                // Use the ID token for AWS credentials
-                AWS.config.region = 'us-west-2';
-                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                    IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
-                    Logins: {
                         'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
                     }
                 });
 
-                lexRuntime = new AWS.LexRuntime();
                 lexRuntime = new AWS.LexRuntime();
 
                 // Now you can use AWS services with the authenticated user
