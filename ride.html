@@ -84,8 +84,11 @@
                 body: JSON.stringify({ message: userMessage }),
             })
             .then(response => response.json())
-            .then(data => {
-                if (data.message) {
+            .then(data => { 
+                if (response.status !== 200) {
+                    console.error('Error:', data);
+                    chatBox.innerHTML += `<div class="bot-message">Error: ${data.body}</div>`;
+                } else if (data.message) {
                     const botMessage = data.message;  // The bot's response from the Lambda function
                     chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
                 } else {
