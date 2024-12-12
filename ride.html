@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -19,6 +19,9 @@
             background-color: #9898f5;
         }
     </style>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@4.5.10/dist/amazon-cognito-identity.min.js"></script>
 </head>
 
 <body>
@@ -125,9 +128,6 @@
 
     <script src="js/vendor/jquery-3.1.0.js"></script>
     <script src="js/vendor/bootstrap.min.js"></script>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
-    <script
-        src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@4.5.10/dist/amazon-cognito-identity.min.js"></script>
     <script src="https://js.arcgis.com/4.6/"></script>
     <script src="js/config.js"></script>
     <script src="js/cognito-auth.js"></script>
@@ -151,35 +151,36 @@
             });
         }
 
-        // Initialize Amazon Bedrock Agent
-        var bedrockAgent;
-
         // Configure AWS region
         AWS.config.region = 'us-west-2'; // Replace with your region
 
-        // Ensure userPool is defined
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool({
-            UserPoolId: 'us-west-2_sey9mTcXd', // Replace with your user pool ID
-            ClientId: '3edmtm0ip9bik5nvnrnl6f738e' // Replace with your client ID
-        });
+        // Cognito User Pool data
+        var poolData = {
+            UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
+            ClientId: '3edmtm0ip9bik5nvnrnl6f738e' // Your client id here
+        };
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
 
-        // Ensure cognitoUser and authenticationDetails are defined
-        var cognitoUser = new AmazonCognitoIdentity.CognitoUser({
-            Username: 'dinaguev1@gmail.com', // Replace with the actual username
+        // User authentication data
+        var authenticationData = {
+            Username: 'dinaguev@amazon.com', // Replace with the username
+            Password: 'ho5laEAST%' // Replace with the password
+        };
+        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+
+        // User data
+        var userData = {
+            Username: 'dinaguev@amazon.com', // Replace with the username
             Pool: userPool
-        });
+        };
+        var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
 
-        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-            Username: 'dinaguev1@gmail.com', // Replace with the actual username
-            Password: 'ho5laEAST%' // Replace with the actual password
-        });
-
+        // Authenticate the user
         cognitoUser.authenticateUser(authenticationDetails, {
             onSuccess: function (result) {
                 var idToken = result.getIdToken().getJwtToken();
-                console.log('ID Token: ' + idToken);
 
-                // Use the ID token for AWS credentials
+                // Configure AWS credentials with the ID token
                 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
                     IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
                     Logins: {
@@ -191,42 +192,36 @@
                     if (err) {
                         console.error(err, err.stack);
                     } else {
-                        bedrockAgent = new AWS.BedrockAgent();
+                        var bedrockAgent = new AWS.BedrockAgent();
+
+                        document.getElementById('sendButton').addEventListener('click', function () {
+                            var input = document.getElementById('chatInput').value;
+                            var userId = generateUUID(); // Generate a unique identifier for the user
+
+                            var params = {
+                                agentAlias: 'Alias', // Replace with your agent's alias
+                                agentName: 'MarketingBuilder', // Replace with your agent's name
+                                userId: userId,
+                                inputText: input
+                            };
+
+                            bedrockAgent.postText(params, function (err, data) {
+                                if (err) {
+                                    console.error(err, err.stack);
+                                } else {
+                                    var chatMessages = document.getElementById('chatMessages');
+                                    var newMessage = document.createElement('div');
+                                    newMessage.textContent = data.message;
+                                    chatMessages.appendChild(newMessage);
+                                }
+                            });
+                        });
                     }
                 });
-
-                // Now you can use AWS services with the authenticated user
             },
             onFailure: function (err) {
                 console.error('Authentication failed:', err.message || JSON.stringify(err));
             }
-        });
-
-        document.getElementById('sendButton').addEventListener('click', function () {
-            if (!bedrockAgent) {
-                console.error('BedrockAgent is not initialized.');
-                return;
-            }
-            var input = document.getElementById('chatInput').value;
-            var userId = generateUUID(); // Generate a unique identifier for the user
-
-            var params = {
-                agentAlias: 'Alias', // Replace with your agent's alias
-                agentName: 'MarketingBuilder', // Replace with your agent's name
-                userId: userId,
-                inputText: input
-            };
-
-            bedrockAgent.postText(params, function (err, data) {
-                if (err) {
-                    console.error(err, err.stack);
-                } else {
-                    var chatMessages = document.getElementById('chatMessages');
-                    var newMessage = document.createElement('div');
-                    newMessage.textContent = data.message;
-                    chatMessages.appendChild(newMessage);
-                }
-            });
         });
     </script>
 </body>
