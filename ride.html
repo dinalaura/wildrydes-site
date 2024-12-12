@@ -138,10 +138,29 @@
         AWS.config.region = 'us-west-2'; // Region
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
             IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Ensure this is the correct IdentityPoolId
-            Logins: {
-                'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': '1' // user pool id and  ID token
-            }
         });
+
+        // Ensure session and poolData are defined
+        var session;
+        var poolData = {
+            UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
+            ClientId: session.getIdToken().getJwtToken() // Your client id here
+        };
+
+        // Get the ID token from the Cognito User Pool
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData); // Ensure userPool is defined
+        var cognitoUser = userPool.getCurrentUser();
+        if (cognitoUser != null) {
+            cognitoUser.getSession(function(err, session) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                AWS.config.credentials.params.Logins = {
+                    'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': session.getIdToken().getJwtToken() // user pool id and ID token
+                };
+            });
+        }
 
         // Create a new Amazon Lex client
         var lexRuntime = new AWS.LexRuntime({ apiVersion: '2016-11-28' });
