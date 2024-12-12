@@ -168,12 +168,18 @@
             })
             .then(response => response.json())
             .then(data => {
-                const botMessage = data.message;  // The bot's response from the Lambda function
-                chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+                if (data.message) {
+                    const botMessage = data.message;  // The bot's response from the Lambda function
+                    chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+                } else {
+                    console.error('No message in response:', data);
+                    chatBox.innerHTML += `<div class="bot-message">Error: No message received</div>`;
+                }
                 chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
             })
             .catch(error => {
                 console.error('Error:', error);
+                chatBox.innerHTML += `<div class="bot-message">Error: ${error.message}</div>`;
             });
         }
     </script>
