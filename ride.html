@@ -157,16 +157,48 @@
         // Configure AWS region
         AWS.config.region = 'us-west-2'; // Replace with your region
 
-        // Initialize Amazon Bedrock Agent
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
+        // Ensure userPool is defined
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool({
+            UserPoolId: 'us-west-2_sey9mTcXd', // Replace with your user pool ID
+            ClientId: '3edmtm0ip9bik5nvnrnl6f738e' // Replace with your client ID
         });
 
-        AWS.config.credentials.get(function (err) {
-            if (err) {
-                console.error(err, err.stack);
-            } else {
-                bedrockAgent = new AWS.BedrockAgent();
+        // Ensure cognitoUser and authenticationDetails are defined
+        var cognitoUser = new AmazonCognitoIdentity.CognitoUser({
+            Username: 'dinaguev1@gmail.com', // Replace with the actual username
+            Pool: userPool
+        });
+
+        var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
+            Username: 'dinaguev1@gmail.com', // Replace with the actual username
+            Password: 'ho5laEAST%' // Replace with the actual password
+        });
+
+        cognitoUser.authenticateUser(authenticationDetails, {
+            onSuccess: function (result) {
+                var idToken = result.getIdToken().getJwtToken();
+                console.log('ID Token: ' + idToken);
+
+                // Use the ID token for AWS credentials
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Your identity pool id here
+                    Logins: {
+                        'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': idToken // Replace with your user pool ID
+                    }
+                });
+
+                AWS.config.credentials.get(function (err) {
+                    if (err) {
+                        console.error(err, err.stack);
+                    } else {
+                        bedrockAgent = new AWS.BedrockAgent();
+                    }
+                });
+
+                // Now you can use AWS services with the authenticated user
+            },
+            onFailure: function (err) {
+                console.error('Authentication failed:', err.message || JSON.stringify(err));
             }
         });
 
