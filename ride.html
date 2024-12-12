@@ -176,10 +176,10 @@
             var userId = generateUUID(); // Generate a unique identifier for the user
 
             var params = {
-                InputText: input,
-                BotAlias: 'Alias', // Replace with your bot's alias
-                BotName: 'MarketingBuilder', // Replace with your bot's name
-                UserId: userId
+                botAlias: 'Alias', // Replace with your bot's alias
+                botName: 'MarketingBuilder', // Replace with your bot's name
+                userId: userId,
+                inputText: input
             };
 
             lexRuntime.postText(params, function(err, data) {
