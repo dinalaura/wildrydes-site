@@ -168,7 +168,7 @@
     })
     .then(response => response.json())
     .then(data => {
-      const botMessage = data.reply;  // The bot's response from the Lambda function
+      const botMessage = data.message;  // The bot's response from the Lambda function
             chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
       chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
     })
