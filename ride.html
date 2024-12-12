@@ -144,8 +144,24 @@
         var session;
         var poolData = {
             UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
-            ClientId: session.getIdToken().getJwtToken() // Your client id here
+            ClientId: '' // Placeholder for client id
         };
+
+        // Get the ID token from the Cognito User Pool
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData); // Ensure userPool is defined
+        var cognitoUser = userPool.getCurrentUser();
+        if (cognitoUser != null) {
+            cognitoUser.getSession(function(err, session) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                poolData.ClientId = session.getIdToken().getJwtToken(); // Set the client id here
+                AWS.config.credentials.params.Logins = {
+                    'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': session.getIdToken().getJwtToken() // user pool id and ID token
+                };
+            });
+        }
 
         // Get the ID token from the Cognito User Pool
         var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData); // Ensure userPool is defined
