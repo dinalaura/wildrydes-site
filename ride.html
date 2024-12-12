@@ -83,16 +83,13 @@
                 },
                 body: JSON.stringify({ message: userMessage }),
             })
-            .then(response => response.json().then(data => ({ status: response.status, body: JSON.parse(data.body) })))
-            .then(({ status, body }) => { 
-                if (status !== 200) {
-                    console.error('Error:', body);
-                    chatBox.innerHTML += `<div class="bot-message">Error: ${body.error}</div>`;
-                } else if (body.message) {
-                    const botMessage = body.message;  // The bot's response from the Lambda function
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    const botMessage = data.message;  // The bot's response from the Lambda function
                     chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
                 } else {
-                    console.error('No message in response:', body);
+                    console.error('No message in response:', data);
                     chatBox.innerHTML += `<div class="bot-message">Error: No message received</div>`;
                 }
                 chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
