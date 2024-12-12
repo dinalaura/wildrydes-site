@@ -18,6 +18,31 @@
         body {
             background-color: #9898f5;
         }
+
+        /* Basic styling for the chat box */
+        .chat-box {
+            width: 300px;
+            height: 400px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+
+        .user-message,
+        .bot-message {
+            margin: 5px 0;
+        }
+
+        .user-message {
+            text-align: right;
+            color: blue;
+        }
+
+        .bot-message {
+            text-align: left;
+            color: green;
+        }
     </style>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
     <script
@@ -46,22 +71,9 @@
     </div>
 
     <!-- NEW SECTION -->
-    <div class="chat-box panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">AWS Solution - Marketing Campaign Builder</h3>
-        </div>
-        <div class="panel-body">
-            <div id="chatMessages" class="chat-messages">
-                <!-- Chat messages will appear here -->
-            </div>
-            <div class="input-group">
-                <input type="text" id="chatInput" class="form-control" placeholder="Escribe tu pregunta...">
-                <span class="input-group-btn">
-                    <button id="sendButton" class="btn btn-primary" type="button">Enter</button>
-                </span>
-            </div>
-        </div>
-    </div>
+    <div class="chat-box" id="chatBox"></div>
+    <input type="text" id="userMessage" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
 
     <div class="sample-questions panel panel-default">
         <div class="panel-heading">
@@ -134,85 +146,36 @@
     <script src="js/esri-map.js"></script>
     <script src="js/ride.js"></script>
     <script>
-        // Initialize the Amazon Cognito credentials provider
-        AWS.config.region = 'us-west-2'; // Region
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: 'us-west-2:56d5dcdb-dea3-47a6-b251-cdd25b721650', // Ensure this is the correct IdentityPoolId
-        });
+            const chatBox = document.getElementById("chatBox");
+            const userMessageInput = document.getElementById("userMessage");
 
-        // Ensure session and poolData are defined
-        var session;
-        var poolData = {
-            UserPoolId: 'us-west-2_sey9mTcXd', // Your user pool id here
-            ClientId: '' // Placeholder for client id
-        };
+            // Function to send message
+            function sendMessage() {
+    const userMessage = userMessageInput.value;
+            if (!userMessage) return; // Do not send empty messages
 
-        // Get the ID token from the Cognito User Pool
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData); // Ensure userPool is defined
-        var cognitoUser = userPool.getCurrentUser();
-        if (cognitoUser != null) {
-            cognitoUser.getSession(function(err, session) {
-                if (err) {
-                    console.log(err);
-                    return;
-                }
-                poolData.ClientId = session.getIdToken().getJwtToken(); // Set the client id here
-                AWS.config.credentials.params.Logins = {
-                    'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': session.getIdToken().getJwtToken() // user pool id and ID token
-                };
-            });
-        }
+            // Display user's message in the chat box
+            chatBox.innerHTML += `<div class="user-message">${userMessage}</div>`;
+            userMessageInput.value = '';  // Clear the input field
 
-        // Get the ID token from the Cognito User Pool
-        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData); // Ensure userPool is defined
-        var cognitoUser = userPool.getCurrentUser();
-        if (cognitoUser != null) {
-            cognitoUser.getSession(function(err, session) {
-                if (err) {
-                    console.log(err);
-                    return;
-                }
-                AWS.config.credentials.params.Logins = {
-                    'cognito-idp.us-west-2.amazonaws.com/us-west-2_sey9mTcXd': session.getIdToken().getJwtToken() // user pool id and ID token
-                };
-            });
-        }
-
-        // Create a new Amazon Lex client
-        var lexRuntime = new AWS.LexRuntime({ apiVersion: '2016-11-28' });
-
-        document.getElementById('sendButton').addEventListener('click', function () {
-            var input = document.getElementById('chatInput').value;
-            if (input) {
-                sendMessageToBedrock(input);
-            }
-        });
-
-        function sendMessageToBedrock(message) {
-            var params = {
-                botAlias: 'Alias', // The alias of the bot
-                botName: 'MarketingBuilder', // The name of the bot
-                inputText: message,
-                userId: '1', // A unique identifier for the user
-            };
-
-            lexRuntime.postText(params, function (err, data) {
-                if (err) {
-                    console.log(err, err.stack); // An error occurred
-                } else {
-                    displayMessage(data.message); // Successful response
-                }
-            });
-        }
-
-        function displayMessage(message) {
-            var chatMessages = document.getElementById('chatMessages');
-            var messageElement = document.createElement('div');
-            messageElement.className = 'chat-message';
-            messageElement.textContent = message;
-            chatMessages.appendChild(messageElement);
-            document.getElementById('chatInput').value = '';
-        }
+            // Send message to API Gateway
+            fetch('https://rimelmpq65.execute-api.us-west-2.amazonaws.com/prod', {
+                method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+      },
+            body: JSON.stringify({message: userMessage }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      const botMessage = data.reply;  // The bot's response from the Lambda function
+            chatBox.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the latest message
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
     </script>
 </body>
 
