@@ -74,7 +74,7 @@
         }
     });
 
-    function sendMessage() {
+    async function sendMessage() {
         const inputField = document.getElementById('chatInput');
         const message = inputField.value.trim();
         if (message === '') return;
@@ -82,26 +82,25 @@
         displayMessage(message, 'user-message');
         inputField.value = '';
 
-        fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message: message })
-        })
-        .then(response => response.json())
-        .then(data => {
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
             if (data.message) {
                 displayMessage(data.message, 'bot-message');
             } else {
                 console.error('No message in response:', data);
                 displayMessage('Error: No message received', 'bot-message');
             }
-        })
-        .catch(error => {
+        } catch (error) {
             console.error('Error:', error);
             displayMessage('Error: Could not connect to the server.', 'bot-message');
-        });
+        }
     }
 
     function displayMessage(message, className) {
@@ -112,7 +111,6 @@
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    </script>
 </body>
 
 </html>
